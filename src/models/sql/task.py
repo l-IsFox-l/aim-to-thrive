@@ -1,14 +1,13 @@
 from __future__ import annotations
 import uuid
+from typing import TYPE_CHECKING
 from datetime import datetime
-from typing import Optional, List, TYPE_CHECKING
 from enum import Enum
 
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import JSONB
 
-# For circular imports issue
 if TYPE_CHECKING:
     from src.models.sql.user import User
     from src.models.sql.task_logs import TaskLogs
@@ -49,5 +48,5 @@ class Task(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
     updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
-    user: User = Relationship(back_populates="tasks")
-    logs: List["TaskLogs"] = Relationship(back_populates="task", sa_relationship_kwargs={"cascade": "all, delete"})
+    user: "User" = Relationship(back_populates="tasks")
+    logs: list["TaskLogs"] = Relationship(back_populates="task", cascade_delete=True)

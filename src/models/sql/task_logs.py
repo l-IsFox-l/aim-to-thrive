@@ -8,7 +8,6 @@ from sqlmodel import SQLModel, Field, UniqueConstraint, Relationship
 if TYPE_CHECKING:
     from src.models.sql.task import Task
 
-
 class TaskLogs(SQLModel, table=True):
     """ """
     __tablename__ = "task_logs"
@@ -24,4 +23,4 @@ class TaskLogs(SQLModel, table=True):
     is_completed: bool = Field(default=False)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-    task: Task = Relationship(back_populates="logs")
+    task: "Task" = Relationship(back_populates="logs")
