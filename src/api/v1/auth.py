@@ -17,3 +17,14 @@ async def register(
 
     return await service.register_new_user(user_data)
 
+@router.get("/get_user", response_model=UserRead)
+async def get_user(user_name: str ,db: AsyncSession = Depends(get_db)):
+    """Get user by email"""
+    user_repo = UserRepository(db)
+    service = AuthService(user_repo)
+    return await service.get_user_data(user_name)
+
+@router.delete("/delete_user")
+async def delete_user(user_name: str, db: AsyncSession = Depends(get_db)):
+    """Deletes user by email and name."""
+    return "TODO: delete user and it's stuff!"

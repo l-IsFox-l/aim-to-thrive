@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from src.models.sql.user import User
 
 class UserRepository:
@@ -11,6 +11,11 @@ class UserRepository:
         result = await self.session.execute(statement)
         return result.scalars().first()
     
+    async def get_by_name(self, name: str) -> User | None:
+        statement = select(User).where(User.name == name)
+        result = await self.session.execute(statement)
+        return result.scalars().first()
+        
     async def create(self, user: User) -> User:
         self.session.add(user)
         await self.session.commit()

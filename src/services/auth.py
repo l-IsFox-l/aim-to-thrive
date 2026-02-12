@@ -13,7 +13,8 @@ class AuthService:
     async def register_new_user(self, user_data: UserCreate):
         # Check for existing user
         existing_user = await self.user_repo.get_by_email(user_data.email)
-        if existing_user:
+        existing_name = await self.user_repo.get_by_name(user_data.name)
+        if existing_user or existing_name:
             raise HTTPException(status_code=400, detail="User already exists")
         
         hashed = pwd_context.hash(user_data.password)
@@ -28,3 +29,9 @@ class AuthService:
         # Save user
         return await self.user_repo.create(new_user)
     
+    async def get_user_data(self, user_name: str):
+        existing_user = await self.user_repo.get_by_name(user_name)
+        if existing_user:
+            return existing_user
+        else:
+            raise HTTPException(status_code=400, detail="User not found!")
