@@ -1,26 +1,22 @@
-from __future__ import annotations
 import uuid
-from datetime import datetime, date
-from typing import TYPE_CHECKING
+import datetime
+from sqlalchemy import ForeignKey, Date, DateTime, Float, Boolean, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from src.models.sql.base import Base
 
-from sqlmodel import SQLModel, Field, UniqueConstraint, Relationship
-
-if TYPE_CHECKING:
-    from src.models.sql.task import Task
-
-class TaskLogs(SQLModel, table=True):
-    """ """
+class TaskLogs(Base):
     __tablename__ = "task_logs"
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    task_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("tasks.id"), index=True)
+    
+    date: Mapped[datetime.date] = mapped_column(Date, index=True)
+    current_value: Mapped[float] = mapped_column(default=0.0)
+    is_completed: Mapped[bool] = mapped_column(default=False)
+    updated_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
+
+    task: Mapped["Task"] = relationship(back_populates="logs")
 
     __table_args__ = (
         UniqueConstraint("task_id", "date", name="unique_task_log_per_day"),
     )
-
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    task_id: uuid.UUID = Field(foreign_key="tasks.id", index=True) # Foreign key
-    date: date = Field(index=True)
-    current_value: float = Field(default=0.0)
-    is_completed: bool = Field(default=False)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-
-    task: "Task" = Relationship(back_populates="logs")

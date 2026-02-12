@@ -1,23 +1,21 @@
-from __future__ import annotations
 import uuid
-from typing import TYPE_CHECKING
 from datetime import datetime
-from sqlmodel import SQLModel, Field, Relationship
+from typing import List
+from sqlalchemy import String, DateTime
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from src.models.sql.base import Base
 
-if TYPE_CHECKING:
-    from src.models.sql.task import Task
-
-class User(SQLModel, table=True):
-    """
-    Represents a user in the multi-tenant system.
-    """
+class User(Base):
     __tablename__ = "users"
 
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    name: str
-    email: str = Field(unique=True ,index=True)
-    hashed_password: str
-    timezone: str = Field(default="UTC")
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    name: Mapped[str] = mapped_column(String(255))
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    hashed_password: Mapped[str] = mapped_column(String)
+    timezone: Mapped[str] = mapped_column(default="UTC")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    tasks: list["Task"] = Relationship(back_populates="user", cascade_delete=True)
+    tasks: Mapped[List["Task"]] = relationship(
+        back_populates="user", 
+        cascade="all, delete-orphan"
+    )

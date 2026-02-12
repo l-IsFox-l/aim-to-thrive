@@ -1,52 +1,39 @@
-from __future__ import annotations
 import uuid
-from typing import TYPE_CHECKING
 from datetime import datetime
 from enum import Enum
-
-from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column
-from sqlalchemy.dialects.postgresql import JSONB
-
-if TYPE_CHECKING:
-    from src.models.sql.user import User
-    from src.models.sql.task_logs import TaskLogs
+from typing import List, Optional, Dict
+from sqlalchemy import String, DateTime, ForeignKey, JSON, Float
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from src.models.sql.base import Base
 
 class TaskType(str, Enum):
     BOOLEAN = "boolean"
     NUMERIC = "numeric"
     DURATION = "duration"
 
-
 class FrequencyType(str, Enum):
     DAILY = "daily"
     WEEKLY = "weekly"
 
-
-class Task(SQLModel, table=True):
-    """
-    Represents a task.
-    """
+class Task(Base):
     __tablename__ = "tasks"
 
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    user_id: uuid.UUID = Field(foreign_key="users.id", index=True) # foreign key
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
 
-    name: str = Field(index=True)
-    description: str | None = None
-    category: str = Field(index=True)
-    task_type: TaskType
+    name: Mapped[str] = mapped_column(String(255), index=True)
+    description: Mapped[Optional[str]] = mapped_column(String)
+    category: Mapped[str] = mapped_column(String(100), index=True)
+    task_type: Mapped[TaskType] = mapped_column(String)
 
-    # For numeric and duration
-    unit: str | None = Field(default=None)
-    target_value: float | None = Field(default=None)
+    unit: Mapped[Optional[str]] = mapped_column(String)
+    target_value: Mapped[Optional[float]] = mapped_column(Float)
 
-    frequency_type: FrequencyType = FrequencyType.DAILY
-    frequency_days: dict = Field(default_factory=dict ,sa_column=Column(JSONB, nullable=False))
-    frequency_count: int | None = Field(default=None)
+    frequency_type: Mapped[FrequencyType] = mapped_column(String, default=FrequencyType.DAILY)
+    frequency_days: Mapped[dict] = mapped_column(JSON, default=dict)
+    
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
-    updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
-
-    user: "User" = Relationship(back_populates="tasks")
-    logs: list["TaskLogs"] = Relationship(back_populates="task", cascade_delete=True)
+    user: Mapped["User"] = relationship(back_populates="tasks")
+    logs: Mapped[List["TaskLogs"]] = relationship(back_populates="task", cascade="all, delete-orphan")

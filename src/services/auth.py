@@ -1,6 +1,6 @@
 from passlib.context import CryptContext
 from fastapi import HTTPException
-from src.models.pydantic.user import UserCreate
+from src.models.pydantic.user import UserCreate, UserRead
 from src.repositories.user import UserRepository
 from src.models.sql.user import User
 
@@ -27,3 +27,4 @@ class AuthService:
 
         # Save user
         return await self.user_repo.create(new_user)
+    

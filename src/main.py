@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from src.utils.settings import STATIC_DIR
 from src.api.v1 import auth
+from src.models import sql
 
 app = FastAPI(
     title="backend",
