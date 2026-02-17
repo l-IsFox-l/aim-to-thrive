@@ -34,4 +34,23 @@ class AuthService:
         if existing_user:
             return existing_user
         else:
+            raise HTTPException(status_code=404, detail="User not found!")
+        
+    async def delete_user_by_name(self, user_name: str):
+        user = await self.user_repo.get_by_name(user_name)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found!")
+        await self.user_repo.delete(user)
+        return {"status": "deleted" ,"message": f"User {user_name} deleted successfuly!"}
+    
+    async def update_username(self, user_name: str, new_name: str):
+        user = await self.user_repo.get_by_name(user_name)
+        if not user:
             raise HTTPException(status_code=400, detail="User not found!")
+        
+        existing_name = await self.user_repo.get_by_name(new_name)
+        if existing_name:
+            raise HTTPException(status_code=400, detail="You can't take already used name!")
+        user.name = new_name
+        await self.user_repo.update(user)
+        return {"status": "updated", "message": f"User name({user_name}) updated to {new_name}!"}
