@@ -2,7 +2,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from src.utils.settings import STATIC_DIR
-from src.api.v1 import auth
+from src.api.v1 import auth, task
 from src.models import sql
 
 app = FastAPI(
@@ -28,3 +28,4 @@ API_V1_PREFIX = "/api/v1"
 
 # Adding routers
 app.include_router(auth.router, prefix=API_V1_PREFIX, tags=["Auth"])
+app.include_router(task.router, prefix=API_V1_PREFIX, tags=["Task"])

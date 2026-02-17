@@ -1,15 +1,29 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Dict
-from datetime import datetime
 from src.models.sql.task import TaskType, FrequencyType
+import uuid
+import datetime
 
 class TaskCreate(BaseModel):
-    name: str
+    user_id: uuid.UUID
+    name: str = Field(..., min_length=1, max_length=255)
     description: Optional[str] = None
-    category: str
+    category: str = Field (..., min_length=1, max_length=100)
     task_type: TaskType
     unit: Optional[str] = None
     target_value: Optional[float] = None
+    frequency_type: FrequencyType = FrequencyType.DAILY
+    frequency_days: Dict = Field(default_factory=dict)
+
+class TaskRead(BaseModel):
+    id: uuid.UUID
+    name: str
+    description: Optional[str]
+    category: str
+    task_type: TaskType
+    unit: Optional[str]
+    target_value: Optional[float]
     frequency_type: FrequencyType
     frequency_days: Dict
-    frequency_count: Optional[int] = None
+    created_at: datetime.datetime
+    updated_at: datetime.datetime

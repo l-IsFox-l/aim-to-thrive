@@ -14,7 +14,7 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String)
     timezone: Mapped[str] = mapped_column(default="UTC")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-    update_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     tasks: Mapped[List["Task"]] = relationship(
         back_populates="user", 
