@@ -27,3 +27,11 @@ class TaskRead(BaseModel):
     frequency_days: Dict
     created_at: datetime.datetime
     updated_at: datetime.datetime
+
+class TaskUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    description: Optional[str] = None
+    category: Optional[str] = Field(None, min_length=1, max_length=100)
+    unit: Optional[str] = None
+    target_value: Optional[float] = None
+    
